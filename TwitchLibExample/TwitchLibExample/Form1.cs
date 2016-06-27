@@ -42,11 +42,30 @@ namespace TwitchLibExample
             MessageBox.Show("This application is intended to demonstrate basic functionality of TwitchLib.\n\n-swiftyspiffy");
         }
 
+        private string TestReplace(MessageEmote caller)
+        {
+            string url = MessageEmote.SourceMatchingReplacementText(caller);
+            if (!url.Equals(caller.Text)) return String.Format("<img src='{0}'/>", url);
+            return url;
+        }
+
         private void button2_Click(object sender, EventArgs e)
         {
-            ConnectionCredentials credentials = new ConnectionCredentials(ConnectionCredentials.ClientType.Chat, new TwitchIpAndPort(textBox8.Text, true), 
+            ConnectionCredentials credentials = new ConnectionCredentials(ConnectionCredentials.ClientType.Chat, new TwitchIpAndPort(textBox8.Text, true),
                 textBox4.Text, textBox5.Text);
             TwitchChatClient newClient = new TwitchChatClient(textBox8.Text, credentials, '!');
+            //newClient.WillReplaceEmotes = true;
+            //MessageEmote.ReplacementDelegate = TestReplace;
+            //List<MessageEmote> ffz = new List<MessageEmote>();
+            //MessageEmote catbag = new MessageEmote("25927", "CatBag", MessageEmote.EmoteSource.FrankerFaceZ);
+            //MessageEmote yoohoo = new MessageEmote("6", "YooHoo", MessageEmote.EmoteSource.FrankerFaceZ);
+            //MessageEmote zreknarf = new MessageEmote("27081", "ZreknarF", MessageEmote.EmoteSource.FrankerFaceZ);
+            //ffz.Add(catbag);
+            //ffz.Add(yoohoo);
+            //ffz.Add(zreknarf);
+            //newClient.ChannelEmotes.Merge(ffz);
+            //newClient.ChannelEmotes.Remove(catbag);
+            //newClient.OnMessageReceived += new EventHandler<TwitchChatClient.OnMessageReceivedArgs>(globalChatMessageReceivedEmote);
             newClient.OnMessageReceived += new EventHandler<TwitchChatClient.OnMessageReceivedArgs>(globalChatMessageReceived);
             newClient.OnCommandReceived += new EventHandler<TwitchChatClient.OnCommandReceivedArgs>(chatCommandReceived);
             newClient.OnIncorrectLogin += new EventHandler<TwitchChatClient.OnIncorrectLoginArgs>(incorrectChatLogin);
@@ -62,7 +81,7 @@ namespace TwitchLibExample
             if(!comboBox2.Items.Contains(textBox4.Text))
                 comboBox2.Items.Add(textBox4.Text);
 
-            
+
         }
 
         private void button3_Click(object sender, EventArgs e)
@@ -129,7 +148,16 @@ namespace TwitchLibExample
             //Don't do this in production
             CheckForIllegalCrossThreadCalls = false;
 
-            richTextBox1.Text = String.Format("#{0} {1}[isSub: {2}]: {3}", e.ChatMessage.Channel, e.ChatMessage.DisplayName, e.ChatMessage.Subscriber, e.ChatMessage.Message) + 
+            richTextBox1.Text = String.Format("#{0} {1}[isSub: {2}]: {3}", e.ChatMessage.Channel, e.ChatMessage.DisplayName, e.ChatMessage.Subscriber, e.ChatMessage.Message) +
+                "\n" + richTextBox1.Text;
+        }
+
+        private void globalChatMessageReceivedEmote(object sender, TwitchChatClient.OnMessageReceivedArgs e)
+        {
+            //Don't do this in production
+            CheckForIllegalCrossThreadCalls = false;
+
+            richTextBox1.Text = String.Format("#{0} {1}[isSub: {2}]: {3}", e.ChatMessage.Channel, e.ChatMessage.DisplayName, e.ChatMessage.Subscriber, e.ChatMessage.EmoteReplacedMessage) +
                 "\n" + richTextBox1.Text;
         }
 
@@ -138,7 +166,7 @@ namespace TwitchLibExample
             //Don't do this in production
             CheckForIllegalCrossThreadCalls = false;
 
-            richTextBox2.Text = String.Format("{0} -> {1}: {2}", e.WhisperMessage.Username, e.WhisperMessage.BotUsername, e.WhisperMessage.Message) + 
+            richTextBox2.Text = String.Format("{0} -> {1}: {2}", e.WhisperMessage.Username, e.WhisperMessage.BotUsername, e.WhisperMessage.Message) +
                 "\n" + richTextBox2.Text;
         }
 
@@ -218,7 +246,7 @@ namespace TwitchLibExample
             } else
             {
                 MessageBox.Show(String.Format("'{0}' does NOT follow the channel '{1}'!", textBox11.Text, textBox12.Text));
-            }   
+            }
         }
 
         private async void button12_Click(object sender, EventArgs e)
@@ -317,7 +345,7 @@ namespace TwitchLibExample
         private void button21_Click(object sender, EventArgs e)
         {
             TwitchLib.TwitchAPIClasses.TwitchStream stream = TwitchApi.GetTwitchStream(textBox25.Text).Result;
-            MessageBox.Show(string.Format("average fps: {0}\nchannel name: {1}\ncreated at: {2}\ndelay: {3}\ngame: {4}\nid: {5}\nplaylist: {6}\npreview large: {7}\nvideo height: {8}\n viewers: {9}", 
+            MessageBox.Show(string.Format("average fps: {0}\nchannel name: {1}\ncreated at: {2}\ndelay: {3}\ngame: {4}\nid: {5}\nplaylist: {6}\npreview large: {7}\nvideo height: {8}\n viewers: {9}",
                 stream.AverageFps, stream.Channel.Name, stream.CreatedAt, stream.Delay, stream.Game, stream.Id, stream.IsPlaylist, stream.Preview.Large, stream.VideoHeight, stream.Viewers));
         }
 
